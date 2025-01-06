@@ -1,11 +1,17 @@
 #Build:
 #run: docker build -t em .
 FROM ubuntu:22.04
+
+COPY internal.pem /usr/local/share/ca-certificates.crt
+COPY startSSH.sh /usr/bin/startSSH.sh
+
 ENV TZ=TZ=Asia/Jerusalem
 ARG DEBIAN_FRONTEND=noninteractive
 #for running godot inside docker
 #RUN apt-get install -y libxcursor1 libxinerama1 libxi6 libgl1-mesa-glx  libxrandr2
-RUN apt-get update && apt-get upgrade && apt-get install -y redis-server net-tools git curl vim sudo python3 python3-devel pip python3-tk python3-opencv openssh-server openssh-clients rsync tcpdump gedit x11-apps
+RUN apt-get update && apt-get upgrade && apt-get install -y ca-certificates && \
+	update-ca-certificates export SSL_CERT_FILE=/usr/local/share/ca-certificates.crt && \
+	apt-get install -y redis-server net-tools git curl vim sudo python3 python3-dev pip python3-tk python3-opencv openssh-server openssh-client rsync tcpdump gedit x11-apps wget nano
 RUN echo which python3: ; \ 
 	which python3 ; \ 
 	echo python3 --version ; \ 
@@ -17,10 +23,13 @@ RUN echo which python3: ; \
     pyproj==3.5.0 pytz==2023.3 rasterio==1.3.9 redis==5.0.4 requests==2.31.0 scipy==1.10 shapely==2.0.1 scikit-image==0.21.0 scikit-learn==1.3.2  utm==0.7.0 \ 
     rticonnextdds-connector==1.2.0 rti.connext==7.3.0
 
+RUN chmod +x /usr/bin/startSSH.sh &&  mkdir -p /run/sshd
+
 ENV DISPLAY=host.docker.internal:0.0
 
-EXPOSE 8000
+# EXPOSE 8000
 
+CMD ["/usr/bin/startSSH.sh"]
 
 
 
