@@ -18,7 +18,7 @@ fi
 
 
 cat << EOF > personal.env
-ai_image=zeevb053/ai-dev:1.0
+ai_image=zeevb053/ai-dev:1.1
 EOF
 
 
