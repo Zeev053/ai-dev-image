@@ -2,16 +2,23 @@
 #run: docker build -t em .
 FROM ubuntu:22.04
 
-COPY internal.pem /usr/local/share/ca-certificates.crt
+# COPY internal.pem /usr/local/share/ca-certificates.crt
 COPY startSSH.sh /usr/bin/startSSH.sh
+ADD https://netfree.link/dl/unix-ca.sh /home/netfree-unix-ca.sh
+RUN cat /home/netfree-unix-ca.sh | sh
+ENV NODE_EXTRA_CA_CERTS=/etc/ca-bundle.crt
+ENV REQUESTS_CA_BUNDLE=/etc/ca-bundle.crt
+ENV SSL_CERT_FILE=/etc/ca-bundle.crt
 
 ENV TZ=TZ=Asia/Jerusalem
 ARG DEBIAN_FRONTEND=noninteractive
 #for running godot inside docker
 #RUN apt-get install -y libxcursor1 libxinerama1 libxi6 libgl1-mesa-glx  libxrandr2
-RUN apt-get update && apt-get upgrade && apt-get install -y ca-certificates && \
-	update-ca-certificates export SSL_CERT_FILE=/usr/local/share/ca-certificates.crt && \
-	apt-get install -y redis-server net-tools git curl vim sudo python3 python3-dev pip python3-tk python3-opencv openssh-server openssh-client rsync tcpdump gedit x11-apps wget nano
+RUN mkdir -p /root/.ssh ; \ 
+	apt-get update ; \ 
+	# update-ca-certificates export SSL_CERT_FILE=/usr/local/share/ca-certificates.crt 
+	apt-get install -y ca-certificates redis-server net-tools git curl vim sudo python3 python3-dev pip python3-tk python3-opencv openssh-server openssh-client rsync \ 
+	tcpdump gedit x11-apps wget gdb gdbserver iputils-ping nano vim
 RUN echo which python3: ; \ 
 	which python3 ; \ 
 	echo python3 --version ; \ 

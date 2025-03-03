@@ -1,6 +1,6 @@
 services:
   fedora-dev:
-    image: ${ci_image}
+    image: ${ai_image}
     network_mode: "host"
 #    privileged: true      
     volumes:
