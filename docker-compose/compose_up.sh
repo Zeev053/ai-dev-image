@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-# run docker compose with update of enviroments
+# run docker compose with update of environments
 
 compose_file="compose.yml"
 
@@ -18,7 +18,7 @@ fi
 
 
 cat << EOF > personal.env
-ai_image=zeevb053/ai-dev:1.1
+ai_image=zeevb053/ai-dev:1.2
 EOF
 
 
