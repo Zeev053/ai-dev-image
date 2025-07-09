@@ -17,7 +17,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN mkdir -p /root/.ssh ; \ 
 	apt-get update ; apt upgrade -y ; \ 
 	# update-ca-certificates export SSL_CERT_FILE=/usr/local/share/ca-certificates.crt 
-	apt-get install -y ca-certificates redis-server net-tools git curl vim sudo  python3-full python3 python3-dev pip pipx python3-tk python3-opencv openssh-server openssh-client rsync \ 
+	apt-get install -y ca-certificates redis-server net-tools git curl vim sudo  python3 python3-venv openssh-server openssh-client rsync \ 
 	tcpdump gedit x11-apps wget gdb gdbserver iputils-ping nano  ; \ 
 	apt-get update ; apt upgrade -y 
 RUN echo which python3: ; \ 
@@ -41,10 +41,7 @@ RUN echo which python3: ; \
 	shapely==2.1.1 scikit-image==0.25.2 scikit-learn==1.7.0  utm==0.8.1 \ 
     rticonnextdds-connector==1.2.0 rti.connext==7.3.0 triangle==20250106 --trusted-host pypi.org --trusted-host files.pythonhosted.org  ;  \
 	/workspace/venv/bin/pip install --upgrade wheel setuptools --trusted-host pypi.org --trusted-host files.pythonhosted.org ;  \
-	cd /workspace/venv/bin  ;  \
-	echo ----- display set ; set ; \
-	echo ----- display env ; env ; \
-	dpkg --remove --force-depends python3-setuptools
+	apt autoremove --purge python3-setuptools-whl python3-cryptography -y
 	
 	
 
