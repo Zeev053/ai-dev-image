@@ -1,6 +1,6 @@
 #Build:
 #run: docker build -t em .
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # COPY internal.pem /usr/local/share/ca-certificates.crt
 COPY startSSH.sh /usr/bin/startSSH.sh
@@ -18,21 +18,35 @@ RUN mkdir -p /root/.ssh ; \
 	apt-get update ; apt upgrade -y ; \ 
 	# update-ca-certificates export SSL_CERT_FILE=/usr/local/share/ca-certificates.crt 
 	apt-get install -y ca-certificates redis-server net-tools git curl vim sudo  python3-full python3 python3-dev pip pipx python3-tk python3-opencv openssh-server openssh-client rsync \ 
-	tcpdump gedit x11-apps wget gdb gdbserver iputils-ping nano
+	tcpdump gedit x11-apps wget gdb gdbserver iputils-ping nano  ; \ 
+	apt-get update ; apt upgrade -y 
 RUN echo which python3: ; \ 
 	which python3 ; \ 
 	echo python3 --version ; \ 
 	python3 --version ; \ 
 	pip -V ; \ 
-	pip install --upgrade pip --trusted-host pypi.org --trusted-host files.pythonhosted.org  ; \ 
-	pip -V ; \ 
+	echo create virtual enviroment  ; \ 
+	mkdir /workspace  ; \ 
+	python3 -m venv /workspace/venv  ; \ 
+	cd /workspace ; \ 
+	chmod +x venv/bin/activate  ; \ 
+	source venv/bin/activate  ; \ 
+	/workspace/venv/bin/pip install --upgrade pip --trusted-host pypi.org --trusted-host files.pythonhosted.org  ; \ 
+	/workspace/venv/bin/pip -V ; \ 
 	# python3 -m pip install -U pip ; \ 
-	pip install  wheel setuptools pytest pytest-cov pytest-spec rich yq trimesh==3.23.5 tqdm==4.66.1 embreex==2.17.7.post5 uvicorn==0.30.6 fastapi==0.115.6 opencv-python gradio gradio_client \ 
+	/workspace/venv/bin/pip install  wheel setuptools pytest pytest-cov pytest-spec rich yq trimesh==3.23.5 tqdm==4.66.1 embreex==2.17.7.post5 uvicorn==0.30.6 fastapi==0.115.6 opencv-python gradio gradio_client \ 
     GPUtil==1.4.0 pillow cryptography dash dash-bootstrap-components python-dateutil==2.8.2 flask==3.0.3 geopandas==0.13.2 \ 
-    jinja2 markupsafe==2.1.3 matplotlib==3.7.1 numpy==1.24.3 ortools==9.9.3963 pandas==2.0.2 plotly==5.15.0 prettytable==3.9.0 psutil==5.9.5 pymap3d==3.0.1 \  
-    pyproj==3.5.0 pytz==2023.3 rasterio==1.3.9 redis==5.0.4 requests scipy==1.10 shapely==2.0.1 scikit-image==0.21.0 scikit-learn==1.3.2  utm==0.7.0 \ 
+    jinja2 markupsafe==2.1.3 matplotlib==3.10.3 numpy==2.3.1 ortools==9.9.3963 pandas==2.3.1 plotly==5.15.0 prettytable==3.9.0 psutil==5.9.5 pymap3d==3.0.1 \  
+    pyproj==3.7.1 pytz==2023.3 rasterio==1.3.9 redis==5.0.4 requests scipy==1.16.0  \ 
+	shapely==2.1.1 scikit-image==0.25.2 scikit-learn==1.7.0  utm==0.8.1 \ 
     rticonnextdds-connector==1.2.0 rti.connext==7.3.0 triangle==20250106 --trusted-host pypi.org --trusted-host files.pythonhosted.org  ;  \
-	pip install --upgrade wheel setuptools --trusted-host pypi.org --trusted-host files.pythonhosted.org 
+	/workspace/venv/bin/pip install --upgrade wheel setuptools --trusted-host pypi.org --trusted-host files.pythonhosted.org ;  \
+	cd /workspace/venv/bin  ;  \
+	echo ----- display set ; set ; \
+	echo ----- display env ; env ; \
+	dpkg --remove --force-depends python3-setuptools
+	
+	
 
 RUN chmod +x /usr/bin/startSSH.sh &&  mkdir -p /run/sshd
 
