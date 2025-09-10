@@ -138,7 +138,7 @@ done
 # ssh_port: RTD_SSH_PORT
 # *** RTD_USER_PASSWORD_SHOULD_NOT_EXIST ***
 # *** RTD_USER_GITLAB_TOKEN_SHOULD_EXIST ***
-# *** RTD_INSTALL_VSCODE_SERVER ***
+# *** RTD_VSCODE_SERVER_URL ***
 
 echo whoami: $(whoami)
 echo
@@ -157,7 +157,7 @@ echo RTD_USER_SHELL: $RTD_USER_SHELL
 echo RTD_MOUNT_DIRECOTRY: $RTD_MOUNT_DIRECOTRY
 echo RTD_MOUNT_TO_FOLDER: $RTD_MOUNT_TO_FOLDER
 # echo RTD_SSH_KEY_BASE64: $RTD_SSH_KEY_BASE64
-echo RTD_INSTALL_VSCODE_SERVER: $RTD_INSTALL_VSCODE_SERVER
+echo RTD_VSCODE_SERVER_URL: $RTD_VSCODE_SERVER_URL
 echo RTD_SSH_PORT: $RTD_SSH_PORT
 echo RTD_USER_PASSWORD_SHOULD_NOT_EXIST: $RTD_USER_PASSWORD_SHOULD_NOT_EXIST
 echo RTD_USER_GITLAB_TOKEN_SHOULD_EXIST: $RTD_USER_GITLAB_TOKEN_SHOULD_EXIST
@@ -449,17 +449,43 @@ then
     git config --system user.email "${git_email}"
     
     # Check if to install vscode server:
-    if [ "${RTD_INSTALL_VSCODE_SERVER}" == true ]
+	# can be url for file, http or gs (google cloud) 
+    if [ -n  "${RTD_VSCODE_SERVER_URL}" ]
     then
-        echo Install vscode-server to user $user_name
+        echo Install vscode-server or ide to user $user_name
         # Find user home:
         user_home=$(getent passwd ${user_name} | cut -d: -f6)
         cd $user_home
-        wget tbd
-        tar -zxf vscode-server.tar.gz
-        rm -f vscode-server.tar.gz
-        chown -R $user_name:$user_g_name .vscode-server
-        chmod -R 777 .vscode-server
+		
+        # web link
+        if [[ "$RTD_VSCODE_SERVER_URL" =~ ^https?:// ]]; then
+            echo "vscode/ide web link: $RTD_VSCODE_SERVER_URL"
+            wget -nv $RTD_VSCODE_SERVER_URL
+            
+        # Google Cloud Storage link
+        elif [[ "$RTD_VSCODE_SERVER_URL" =~ ^gs:// ]]; then
+            echo "vscode/ide Google Cloud Storage link: $RTD_VSCODE_SERVER_URL"
+            gsutil cp $RTD_VSCODE_SERVER_URL .
+
+        # File path link
+        elif [[ "$RTD_VSCODE_SERVER_URL" =~ ^/ ]]; then
+            echo "vscode/ide - file path: $RTD_VSCODE_SERVER_URL"
+            cp $RTD_VSCODE_SERVER_URL .
+
+        # Unknown type link
+        else
+            echo "Unknown type"
+        fi
+
+        ide_tar=$(basename "$RTD_VSCODE_SERVER_URL")
+        if [[ -f "$ide_tar" ]]; then
+            echo "Exract the file $ide_tar"
+            tar -zxf --no-same-owner --mode=777 "$ide_tar"
+            rm -f "$ide_tar"
+        else
+            echo "The archive file $ide_tar is not exist !!!"
+        fi
+
     fi
 fi
 
