@@ -480,7 +480,14 @@ then
         ide_tar=$(basename "$RTD_VSCODE_SERVER_URL")
         if [[ -f "$ide_tar" ]]; then
             echo "Exract the file $ide_tar"
-            tar -zxf --no-same-owner --mode=777 "$ide_tar"
+            tar -zxf "$ide_tar" --no-same-owner 
+            top_entry=$(tar -tzf "$ide_tar" | head -1 | cut -d/ -f1)
+            if [ -d "$top_entry" ]; then
+                chmod -R 777 "$top_entry"
+                echo "Permissions set to 777 on: $top_entry"
+            else
+                echo "Warning: $top_entry is not a directory"
+            fi            
             rm -f "$ide_tar"
         else
             echo "The archive file $ide_tar is not exist !!!"
